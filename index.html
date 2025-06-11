@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmazonQ タイピングゲーム</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 AmazonQ タイピングゲーム</h1>
+            <div class="stats">
+                <div class="stat">
+                    <span class="label">スコア:</span>
+                    <span id="score">100</span>
+                </div>
+                <div class="stat">
+                    <span class="label">残り時間:</span>
+                    <span id="timer">60</span>
+                </div>
+                <div class="stat">
+                    <span class="label">ミス:</span>
+                    <span id="mistakes">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="game-area">
+                <div class="text-display" id="textDisplay">
+                    <span id="currentText">ゲームを開始してください</span>
+                </div>
+                
+                <div class="input-area">
+                    <input type="text" id="textInput" placeholder="ここにタイピングしてください..." disabled>
+                </div>
+                
+                <div class="controls">
+                    <button id="startBtn" class="btn primary">ゲーム開始</button>
+                    <button id="resetBtn" class="btn secondary">リセット</button>
+                    <select id="difficulty" class="difficulty-select">
+                        <option value="easy">初級（短い単語）</option>
+                        <option value="medium" selected>中級（普通の単語）</option>
+                        <option value="hard">上級（長い単語）</option>
+                        <option value="mixed">ミックス（全部）</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="results" id="results" style="display: none;">
+                <h2>🎉 ゲーム終了！</h2>
+                <div class="result-stats">
+                    <div class="result-item">
+                        <span class="result-label">最終スコア:</span>
+                        <span id="finalScore">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">完了した文字数:</span>
+                        <span id="completedWords">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">総ミス数:</span>
+                        <span id="totalMistakes">0</span>
+                    </div>
+                </div>
+                <button id="playAgainBtn" class="btn primary">もう一度プレイ</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
