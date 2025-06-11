@@ -1,0 +1,112 @@
+=== AmazonQ Typing Game デプロイ デバッグログ ===
+日時: 2025-06-11 06:00:00 UTC
+プロジェクト: AmazonQ_Typing_Games
+
+=== 問題の発生 ===
+ユーザーが展開シェル実行時に以下のエラーが発生:
+```
+Resource handler returned message: "Resource amazonq-typing-game-dev-835371233285/* must be in ARN format or "*". (Service: Iam, Status Code: 400, Request ID: 7bf5d172-a97d-43cc-8f08-860616705c1f) (SDK Attempt Count: 1)" (RequestToken: af8d0ac7-fa8e-4099-bfb4-b39428ca2ab9, HandlerErrorCode: InvalidRequest)
+```
+
+=== 原因分析 ===
+CloudFormationテンプレートのIAMポリシーでARN形式が正しくない問題を特定:
+
+1. **IAMロールのS3リソースARN形式エラー**:
+   - 誤: `Resource: !Sub '${GameBucket}/*'`
+   - 正: `Resource: !Sub 'arn:aws:s3:::${GameBucket}/*'`
+
+2. **S3バケットポリシーのリソースARN形式エラー**:
+   - 誤: `Resource: !Sub '${GameBucket}/*'`
+   - 正: `Resource: !Sub 'arn:aws:s3:::${GameBucket}/*'`
+
+=== 実行したデバッグ手順 ===
+
+1. **CloudFormationテンプレート確認**:
+   - cloudformation.yamlの内容を確認
+   - IAMポリシーとS3バケットポリシーの問題箇所を特定
+
+2. **スタックイベント確認**:
+   ```bash
+   aws cloudformation describe-stack-events --stack-name amazonq-typing-game
+   ```
+   
+   エラー詳細:
+   - GameBucketPolicy CREATE_FAILED
+   - "Policy has invalid resource" エラー
+   - ResourceStatusReason: ARN形式が正しくない
+
+3. **修正内容**:
+   
+   **IAMロールポリシー修正**:
+   ```yaml
+   # 修正前
+   Resource: !Sub '${GameBucket}/*'
+   
+   # 修正後  
+   Resource: !Sub 'arn:aws:s3:::${GameBucket}/*'
+   ```
+   
+   **S3バケットポリシー修正**:
+   ```yaml
+   # 修正前
+   Resource: !Sub '${GameBucket}/*'
+   
+   # 修正後
+   Resource: !Sub 'arn:aws:s3:::${GameBucket}/*'
+   ```
+   
+   **追加改善**:
+   - s3:ListBucket権限を追加
+   - バケット自体へのアクセス権限も明示的に設定
+
+4. **失敗したスタックの削除**:
+   ```bash
+   aws cloudformation delete-stack --stack-name amazonq-typing-game --region ap-northeast-1
+   ```
+
+5. **修正後の再デプロイ**:
+   ```bash
+   ./deploy.sh
+   ```
+
+=== 修正結果 ===
+
+✅ **デプロイ成功**:
+- CloudFormationスタック: amazonq-typing-game
+- S3バケット: amazonq-typing-game-dev-835371233285  
+- CloudFront Distribution ID: E209IWNDQ7RE89
+- ゲームURL: https://d3vbxwqv2qahun.cloudfront.net
+
+✅ **アップロード完了**:
+- index.html (3.0 KiB)
+- style.css (4.6 KiB) 
+- script.js (18.2 KiB)
+
+✅ **CloudFrontキャッシュ無効化完了**
+
+=== 学んだポイント ===
+
+1. **ARN形式の重要性**:
+   - AWSリソースを参照する際は必ず正しいARN形式を使用
+   - CloudFormation内でのリソース参照でも例外ではない
+
+2. **エラーデバッグの手順**:
+   - CloudFormationスタックイベントで詳細なエラー情報を確認
+   - ResourceStatusReasonでエラーの根本原因を特定
+   - 段階的に問題を切り分けて修正
+
+3. **S3とIAMの連携**:
+   - S3バケットポリシーとIAMロールポリシー両方でARN形式統一が必要
+   - s3:ListBucket権限も適切に設定することが重要
+
+=== 最終状態 ===
+- プロジェクト: 正常にデプロイ完了
+- ゲーム: CloudFront経由でアクセス可能
+- インフラ: S3 + CloudFront構成で安定稼働
+
+=== 次回への改善点 ===
+- テンプレート作成時にARN形式のバリデーションを事前実施
+- デプロイ前のテンプレート構文チェックを自動化
+- エラーハンドリングをより詳細に実装
+
+ログ保存日時: 2025-06-11 06:00:00 UTC

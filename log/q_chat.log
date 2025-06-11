@@ -81,3 +81,16 @@ AWS展開: ./deploy.sh
 [ユーザー] 問題が無いのでこのままGitにコミット，プッシュまで実施してもらえますか？
 
 [AmazonQ] はーい！問題がないということで、Gitにコミット・プッシュまで実施しますね〜✨
+Git操作完了〜🎉
+
+実行した操作:
+✅ git add . - すべてのファイルをステージング
+✅ git commit - 詳細なコミットメッセージでコミット
+✅ git push origin main - GitHubにプッシュ
+
+コミット情報:
+- コミットハッシュ: b6986a5
+- 7ファイル変更、1281行追加、1行削除
+- リモートリポジトリ: github.com:HimekoYuri/AmazonQ_Typing_Games.git
+
+すべて正常に完了しました〜✨

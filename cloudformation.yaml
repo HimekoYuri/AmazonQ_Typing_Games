@@ -45,7 +45,7 @@ Resources:
             Effect: Allow
             Principal: '*'
             Action: s3:GetObject
-            Resource: !Sub '${GameBucket}/*'
+            Resource: !Sub 'arn:aws:s3:::${GameBucket}/*'
 
   # CloudFront Origin Access Control
   OriginAccessControl:
@@ -120,7 +120,11 @@ Resources:
                   - s3:PutObjectAcl
                   - s3:GetObject
                   - s3:DeleteObject
-                Resource: !Sub '${GameBucket}/*'
+                Resource: !Sub 'arn:aws:s3:::${GameBucket}/*'
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource: !Sub 'arn:aws:s3:::${GameBucket}'
               - Effect: Allow
                 Action:
                   - cloudfront:CreateInvalidation
