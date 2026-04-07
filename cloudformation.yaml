@@ -20,32 +20,35 @@ Resources:
     Properties:
       BucketName: !Sub '${BucketName}-${Environment}-${AWS::AccountId}'
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: false
-        BlockPublicPolicy: false
-        IgnorePublicAcls: false
-        RestrictPublicBuckets: false
-      WebsiteConfiguration:
-        IndexDocument: index.html
-        ErrorDocument: index.html
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
       CorsConfiguration:
         CorsRules:
-          - AllowedHeaders: ['*']
+          - AllowedHeaders:
+              - Content-Type
             AllowedMethods: [GET, HEAD]
-            AllowedOrigins: ['*']
+            AllowedOrigins:
+              - !Sub 'https://${GameDistribution.DomainName}'
             MaxAge: 3600
 
-  # S3 Bucket Policy for public read access
+  # S3 Bucket Policy for CloudFront OAC access only
   GameBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket: !Ref GameBucket
       PolicyDocument:
         Statement:
-          - Sid: PublicReadGetObject
+          - Sid: AllowCloudFrontServicePrincipal
             Effect: Allow
-            Principal: '*'
+            Principal:
+              Service: cloudfront.amazonaws.com
             Action: s3:GetObject
             Resource: !Sub 'arn:aws:s3:::${GameBucket}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${GameDistribution}'
 
   # CloudFront Origin Access Control
   OriginAccessControl:
